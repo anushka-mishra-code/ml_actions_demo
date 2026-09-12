@@ -1,15 +1,20 @@
-# Use an official Python runtime as a parent image
+# Use an official Python runtime
 FROM python:3.9-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the script and dataset into the container
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files and dataset
+COPY app.py .
 COPY ml_example.py .
 COPY data.csv .
 
-# Install required Python packages for the ML script
-RUN pip install --no-cache-dir pandas scikit-learn numpy
+# Expose FastAPI port
+EXPOSE 8000
 
-# Specify the command to run your ML script
-CMD ["python", "ml_example.py"]
+# Run FastAPI app using Uvicorn server
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
